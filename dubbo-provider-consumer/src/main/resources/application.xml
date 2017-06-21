@@ -5,20 +5,25 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://code.alibabatech.com/schema/dubbo
         http://code.alibabatech.com/schema/dubbo/dubbo.xsd ">
-    <!-- 具体的实现bean -->
-    <bean id="userServiceImpl" class="com.jifuwei.provider.UserServiceImpl"/>
-    <bean id="userSearchServiceImpl" class="com.jifuwei.provider.UserSearchServiceImpl"/>
+
 
     <!-- 提供方应用信息，用于计算依赖关系 -->
-    <dubbo:application name="provider"/>
+    <dubbo:application name="provider-consumer"/>
 
     <!-- 使用zookeeper注册中心暴露服务地址 -->
     <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
 
     <!-- 用dubbo协议在20880端口暴露服务 -->
-    <dubbo:protocol name="dubbo" port="29014"/>
+    <dubbo:protocol name="dubbo" port="29015"/>
+
+    <!-- 生成远程服务代理，可以和本地bean一样使用 -->
+    <dubbo:reference id="iUserSearchService" interface="com.jifuwei.user.IUserSearchService"/>
+
+    <!-- 具体的实现bean -->
+    <bean id="userSearchServiceImpl" class="com.jifuwei.pc.UserSearchServiceImpl">
+        <property name="userSearchService" ref="iUserSearchService"></property>
+    </bean>
 
     <!-- 声明需要暴露的服务接口 -->
-    <dubbo:service interface="com.jifuwei.user.IUserService" ref="userServiceImpl"/>
-    <dubbo:service interface="com.jifuwei.user.IUserSearchService" ref="userSearchServiceImpl"/>
+    <dubbo:service interface="com.jifuwei.user.IPCUserSearchService" ref="userSearchServiceImpl"/>
 </beans>
